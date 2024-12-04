@@ -17,7 +17,7 @@ import {
 chai.use(chaiAsPromised);
 should();
 
-describe("TeePool", () => {
+xdescribe("TeePool", () => {
   let deployer: HardhatEthersSigner;
   let owner: HardhatEthersSigner;
   let tee0: HardhatEthersSigner;

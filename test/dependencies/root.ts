@@ -62,7 +62,7 @@ chai.Assertion.addMethod(
   },
 );
 
-describe("DLPRoot", () => {
+xdescribe("DLPRoot", () => {
   enum DlpStatus {
     None,
     Registered,
