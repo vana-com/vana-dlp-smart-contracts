@@ -4,6 +4,9 @@ pragma solidity 0.8.24;
 import {DataLiquidityPoolImplementation} from "../../dlp/DataLiquidityPoolImplementation.sol";
 
 contract DataLiquidityPoolImplementationV2Mock is DataLiquidityPoolImplementation {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor(address trustedForwarder) DataLiquidityPoolImplementation(trustedForwarder) {}
+
     /**
      * @notice Upgrade the contract
      * This function is required by OpenZeppelin's UUPSUpgradeable
