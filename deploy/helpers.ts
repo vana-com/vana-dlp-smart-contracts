@@ -1,5 +1,4 @@
 import { deployments, ethers, run, upgrades } from "hardhat";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 export async function getUUPSImplementationAddress(
