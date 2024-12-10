@@ -51,6 +51,7 @@ interface IDataLiquidityPool {
     function unpause() external;
     function updateFileRewardFactor(uint256 newFileRewardFactor) external;
     function updateTeePool(address newTeePool) external;
+    function updateDataRegistry(address newDataRegistry) external;
     function updateProofInstruction(string calldata newProofInstruction) external;
     function updatePublicKey(string calldata newProofInstruction) external;
     function requestReward(uint256 registryFileId, uint256 proofIndex) external;
