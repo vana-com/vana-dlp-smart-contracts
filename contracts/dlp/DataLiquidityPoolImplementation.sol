@@ -3,6 +3,7 @@ pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol"; // Import ERC2771Context
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
@@ -10,6 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/DataLiquidityPoolStorageV1.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol"; // Import ERC2771Context
 
 contract DataLiquidityPoolImplementation is
     UUPSUpgradeable,
@@ -17,6 +19,7 @@ contract DataLiquidityPoolImplementation is
     Ownable2StepUpgradeable,
     ReentrancyGuardUpgradeable,
     MulticallUpgradeable,
+    ERC2771ContextUpgradeable,
     DataLiquidityPoolStorageV1
 {
     using EnumerableSet for EnumerableSet.UintSet;
@@ -91,7 +94,7 @@ contract DataLiquidityPoolImplementation is
     error InvalidProof();
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor(address trustedForwarder) ERC2771ContextUpgradeable(trustedForwarder) {
         _disableInitializers();
     }
 
@@ -135,6 +138,28 @@ contract DataLiquidityPoolImplementation is
      * @param newImplementation                  new implementation
      */
     function _authorizeUpgrade(address newImplementation) internal virtual override onlyOwner {}
+
+    function _msgSender()
+        internal
+        view
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        return ERC2771ContextUpgradeable._msgSender();
+    }
+
+    function _msgData() internal view override(ContextUpgradeable, ERC2771ContextUpgradeable) returns (bytes calldata) {
+        return ERC2771ContextUpgradeable._msgData();
+    }
+
+    function _contextSuffixLength()
+        internal
+        view
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (uint256)
+    {
+        return ERC2771ContextUpgradeable._contextSuffixLength();
+    }
 
     /**
      * returns the version of the contract
