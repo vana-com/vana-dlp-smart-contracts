@@ -151,6 +151,7 @@ Before deploying or interacting with the contracts, you need to set up your envi
 <a id="env-truested_forwarder_address"></a>
 `TRESTED_FORWARDER_ADDRESS`: The address of the trusted forwarder contract. This contract is used for gasless transactions. (E.g. **0x853407D0C625Ce7E43C0a2596fBc470C3a6f8305**). Read [gelato documentation](https://docs.gelato.network/web3-services/relay/supported-networks#new-deployments-oct-2024) for more details.  
 The integration with gelato is optional, you can set this parameter to 0x0000000000000000000000000000000000000000 if you don't want to use it.
+The ERC2771 integration was added in v1 of the Vana Framework. If you've already deployed the [v0 version](https://github.com/vana-com/vana-dlp-smart-contracts/tree/v0), you can still use the Gelato integration by using the [sponsoredCall](https://docs.gelato.network/web3-services/relay/non-erc-2771/sponsoredcall) function.
 
 `DLP_NAME`: The name of your Data Liquidity Pool. Choose a descriptive name for your DLP. (E.g. **CookieDLP**)
 
