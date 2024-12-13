@@ -21,8 +21,10 @@ module.exports = {
     },
   },
   networks: {
-    hardhat: {},
-    islander: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
+     islander: {
       url: process.env.ISLANDER_RPC_URL || "",
       accounts:
         process.env.DEPLOYER_PRIVATE_KEY !== undefined
@@ -37,6 +39,7 @@ module.exports = {
         process.env.DEPLOYER_PRIVATE_KEY !== undefined
           ? [process.env.DEPLOYER_PRIVATE_KEY]
           : [],
+      allowUnlimitedContractSize: true,
     },
     satori: {
       url: process.env.SATORI_RPC_URL || "",
@@ -45,6 +48,7 @@ module.exports = {
         process.env.DEPLOYER_PRIVATE_KEY !== undefined
           ? [process.env.DEPLOYER_PRIVATE_KEY]
           : [],
+      allowUnlimitedContractSize: true,
     },
   },
   etherscan: {
