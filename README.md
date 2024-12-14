@@ -160,10 +160,10 @@ The ERC2771 integration was added in v1 of the Vana Framework. If you've already
 Generate a Private-Public Key Pair using the [Vana CLI](https://github.com/vana-com/vana-framework?tab=readme-ov-file#wallets) with the following command:
 
 ```bash
-vanacli create
+vanacli wallet create
 ```
 
-The command will output a response similar to this:
+The command will create a wallet in `~/.vana/wallets/` which will look like this:
 
 ```json
 {
