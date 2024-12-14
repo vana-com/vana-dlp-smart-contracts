@@ -154,8 +154,6 @@ The ERC2771 integration was added in v1 of the Vana Framework. If you've already
 
 `DLP_NAME`: The name of your Data Liquidity Pool. Choose a descriptive name for your DLP. (E.g. **CookieDLP**)
 
-Here’s an improved version of your README part for better clarity and professionalism:
-
 <a id="env-dlp-public-key"></a>
 `DLP_PUBLIC_KEY`: A public key for your DLP, used for encryption purposes. This key allows data contributors to encrypt the encryption key securely. Your DLP can then use the corresponding private key to decrypt and access the encrypted files. For more details on the encryption process, refer to the [data privacy section](https://docs.vana.org/docs/data-privacy#code-samples).
 
