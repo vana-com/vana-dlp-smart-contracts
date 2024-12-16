@@ -382,7 +382,6 @@ contract DataLiquidityPoolImplementation is
 
         emit RewardRequested(registryFile.ownerAddress, fileId, proofIndex, file.rewardAmount);
     }
-    error MsgSender(address sender, address msgSender);
 
     /**
      * @notice Adds rewards for contributors

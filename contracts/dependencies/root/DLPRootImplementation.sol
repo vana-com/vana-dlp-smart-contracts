@@ -4,7 +4,6 @@ pragma solidity 0.8.24;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -17,7 +16,6 @@ contract DLPRootImplementation is
     PausableUpgradeable,
     AccessControlUpgradeable,
     ReentrancyGuardUpgradeable,
-    MulticallUpgradeable,
     ERC2771ContextUpgradeable,
     DLPRootStorageV1
 {
@@ -84,6 +82,7 @@ contract DLPRootImplementation is
     error InvalidDlpId();
     error InvalidDlpStatus();
     error InvalidAddress();
+    error InvalidName();
     error NotDlpOwner();
     error NotStakeOwner();
     error NothingToClaim();
@@ -124,52 +123,53 @@ contract DLPRootImplementation is
         uint256 epochRewardAmount;
     }
 
-    function initialize(InitParams memory params) external initializer {
-        __AccessControl_init();
-        __UUPSUpgradeable_init();
-        __ReentrancyGuard_init();
-        __Pausable_init();
-        __Multicall_init();
+    //    function initialize(InitParams memory params) external initializer {
+    //        __AccessControl_init();
+    //        __UUPSUpgradeable_init();
+    //        __ReentrancyGuard_init();
+    //        __Pausable_init();
+    //
+    //        if (
+    //            params.minDlpStakersPercentage < 1e16 ||
+    //            params.maxDlpStakersPercentage > 100e18 ||
+    //            params.minDlpStakersPercentage > params.maxDlpStakersPercentage ||
+    //            params.epochDlpsLimit > params.eligibleDlpsLimit ||
+    //            params.minStakeAmount > params.minDlpRegistrationStake ||
+    //            params.minDlpRegistrationStake > params.dlpSubEligibilityThreshold ||
+    //            params.dlpSubEligibilityThreshold > params.dlpEligibilityThreshold
+    //        ) {
+    //            revert InvalidParam();
+    //        }
+    //
+    //        _trustedForwarder = params.trustedForwarder;
+    //        eligibleDlpsLimit = params.eligibleDlpsLimit;
+    //        epochDlpsLimit = params.epochDlpsLimit;
+    //        minStakeAmount = params.minStakeAmount;
+    //        minDlpStakersPercentage = params.minDlpStakersPercentage;
+    //        maxDlpStakersPercentage = params.maxDlpStakersPercentage;
+    //        minDlpRegistrationStake = params.minDlpRegistrationStake;
+    //        dlpEligibilityThreshold = params.dlpEligibilityThreshold;
+    //        dlpSubEligibilityThreshold = params.dlpSubEligibilityThreshold;
+    //        _checkpointPush(_stakeWithdrawalDelayCheckpoints, params.stakeWithdrawalDelay);
+    //        _checkpointPush(_rewardClaimDelayCheckpoints, params.rewardClaimDelay);
+    //        epochSize = params.epochSize;
+    //        daySize = params.daySize;
+    //        epochRewardAmount = params.epochRewardAmount;
+    //
+    //        // Initialize first epoch
+    //        Epoch storage epoch0 = _epochs[0];
+    //        epoch0.startBlock = Math.min(params.startBlock - 2, block.number);
+    //        epoch0.endBlock = params.startBlock - 1;
+    //        epoch0.isFinalised = true;
+    //
+    //        _setRoleAdmin(MAINTAINER_ROLE, DEFAULT_ADMIN_ROLE);
+    //        _setRoleAdmin(MANAGER_ROLE, MAINTAINER_ROLE);
+    //        _grantRole(DEFAULT_ADMIN_ROLE, params.ownerAddress);
+    //        _grantRole(MAINTAINER_ROLE, params.ownerAddress);
+    //        _grantRole(MANAGER_ROLE, params.ownerAddress);
+    //    }
 
-        if (
-            params.minDlpStakersPercentage < 1e16 ||
-            params.maxDlpStakersPercentage > 100e18 ||
-            params.minDlpStakersPercentage > params.maxDlpStakersPercentage ||
-            params.epochDlpsLimit > params.eligibleDlpsLimit ||
-            params.minStakeAmount > params.minDlpRegistrationStake ||
-            params.minDlpRegistrationStake > params.dlpSubEligibilityThreshold ||
-            params.dlpSubEligibilityThreshold > params.dlpEligibilityThreshold
-        ) {
-            revert InvalidParam();
-        }
-
-        _trustedForwarder = params.trustedForwarder;
-        eligibleDlpsLimit = params.eligibleDlpsLimit;
-        epochDlpsLimit = params.epochDlpsLimit;
-        minStakeAmount = params.minStakeAmount;
-        minDlpStakersPercentage = params.minDlpStakersPercentage;
-        maxDlpStakersPercentage = params.maxDlpStakersPercentage;
-        minDlpRegistrationStake = params.minDlpRegistrationStake;
-        dlpEligibilityThreshold = params.dlpEligibilityThreshold;
-        dlpSubEligibilityThreshold = params.dlpSubEligibilityThreshold;
-        _checkpointPush(_stakeWithdrawalDelayCheckpoints, params.stakeWithdrawalDelay);
-        _checkpointPush(_rewardClaimDelayCheckpoints, params.rewardClaimDelay);
-        epochSize = params.epochSize;
-        daySize = params.daySize;
-        epochRewardAmount = params.epochRewardAmount;
-
-        // Initialize first epoch
-        Epoch storage epoch0 = _epochs[0];
-        epoch0.startBlock = Math.min(params.startBlock - 2, block.number);
-        epoch0.endBlock = params.startBlock - 1;
-        epoch0.isFinalised = true;
-
-        _setRoleAdmin(MAINTAINER_ROLE, DEFAULT_ADMIN_ROLE);
-        _setRoleAdmin(MANAGER_ROLE, MAINTAINER_ROLE);
-        _grantRole(DEFAULT_ADMIN_ROLE, params.ownerAddress);
-        _grantRole(MAINTAINER_ROLE, params.ownerAddress);
-        _grantRole(MANAGER_ROLE, params.ownerAddress);
-    }
+    receive() external payable {}
 
     function _authorizeUpgrade(address newImplementation) internal virtual override onlyRole(DEFAULT_ADMIN_ROLE) {}
 
@@ -253,6 +253,10 @@ contract DLPRootImplementation is
         return dlps(dlpIds[dlpAddress]);
     }
 
+    function dlpsByName(string calldata dlpName) external view override returns (DlpInfo memory) {
+        return dlps(dlpNameToId[dlpName]);
+    }
+
     function eligibleDlpsListValues() external view override returns (uint256[] memory) {
         return _eligibleDlpsList.values();
     }
@@ -279,6 +283,10 @@ contract DLPRootImplementation is
                 endBlock: stake.endBlock,
                 lastClaimedEpochId: _dlps[stake.dlpId].epochIds[stake.lastClaimedIndexEpochId]
             });
+    }
+
+    function stakeClaimedAmounts(uint256 stakeId, uint256 epochId) external view override returns (uint256) {
+        return _stakes[stakeId].claimedAmounts[epochId];
     }
 
     function epochs(uint256 epochId) external view override returns (EpochInfo memory) {
@@ -312,10 +320,10 @@ contract DLPRootImplementation is
             });
     }
 
-    function stakerListCount() external view returns (uint256) {
+    function stakersListCount() external view returns (uint256) {
         return _stakersList.length();
     }
-    function stakerListAt(uint256 index) external view returns (address) {
+    function stakersListAt(uint256 index) external view returns (address) {
         return _stakersList.at(index);
     }
 
@@ -329,6 +337,25 @@ contract DLPRootImplementation is
 
     function stakerDlpsListValues(address staker) external view override returns (uint256[] memory) {
         return _stakers[staker].dlpIds.values();
+    }
+
+    function stakerStakesListCount(address stakerAddress) external view returns (uint256) {
+        return _stakers[stakerAddress].stakeIds.length();
+    }
+
+    function stakerStakesListAt(address stakerAddress, uint256 index) external view returns (uint256) {
+        return _stakers[stakerAddress].stakeIds.at(index);
+    }
+    function stakerStakesListValues(address stakerAddress) external view returns (uint256[] memory) {
+        return _stakers[stakerAddress].stakeIds.values();
+    }
+
+    function stakerTotalStakeAmount(address stakerAddress) external view returns (uint256) {
+        return _stakers[stakerAddress].totalStakeAmount;
+    }
+
+    function stakerDlpStakeAmount(address stakerAddress, uint256 dlpId) external view returns (uint256) {
+        return _stakers[stakerAddress].dlpStakeAmounts[dlpId];
     }
 
     /**
@@ -578,6 +605,18 @@ contract DLPRootImplementation is
         _trustedForwarder = trustedForwarderAddress;
     }
 
+    function overrideEpoch(
+        uint256 epochId,
+        uint256 startBlock,
+        uint256 endBlock,
+        uint256 rewardAmount
+    ) external override onlyRole(MAINTAINER_ROLE) {
+        Epoch storage epoch = _epochs[epochId];
+        epoch.startBlock = startBlock;
+        epoch.endBlock = endBlock;
+        epoch.rewardAmount = rewardAmount;
+    }
+
     /**
      * @notice Updates stake scores for DLPs in past epochs
      */
@@ -611,7 +650,7 @@ contract DLPRootImplementation is
      */
     function overrideEpochDlpsTotalStakesScore(
         EpochDlpsTotalStakesScore memory stakeScore
-    ) external override onlyRole(MANAGER_ROLE) {
+    ) external override onlyRole(MAINTAINER_ROLE) {
         Epoch storage epoch = _epochs[stakeScore.epochId];
         if (_dlps[stakeScore.dlpId].dlpAddress == address(0)) {
             revert InvalidDlpId();
@@ -825,6 +864,10 @@ contract DLPRootImplementation is
 
         Staker storage staker = _stakers[stakerAddress];
         staker.dlpIds.add(dlpId);
+        staker.dlpStakeAmounts[dlpId] += amount;
+        staker.stakeIds.add(stakesCount);
+        staker.totalStakeAmount += amount;
+
         _stakersList.add(stakerAddress);
         _checkpointAdd(dlp.stakeAmountCheckpoints, amount);
 
@@ -855,6 +898,10 @@ contract DLPRootImplementation is
         if (stake.endBlock != 0) {
             revert StakeAlreadyClosed();
         }
+
+        Staker storage staker = _stakers[stakerAddress];
+        staker.dlpStakeAmounts[stake.dlpId] -= stake.amount;
+        staker.totalStakeAmount -= stake.amount;
 
         Dlp storage dlp = _dlps[stake.dlpId];
         _checkpointAdd(dlp.unstakeAmountCheckpoints, stake.amount);
@@ -920,6 +967,10 @@ contract DLPRootImplementation is
             revert InvalidDlpStatus();
         }
 
+        if (dlpNameToId[registrationInfo.name] != 0 || bytes(registrationInfo.name).length == 0) {
+            revert InvalidName();
+        }
+
         if (
             registrationInfo.stakersPercentage < minDlpStakersPercentage ||
             registrationInfo.stakersPercentage > maxDlpStakersPercentage
@@ -947,6 +998,8 @@ contract DLPRootImplementation is
         dlp.registrationBlockNumber = block.number;
 
         dlpIds[registrationInfo.dlpAddress] = dlpId;
+
+        dlpNameToId[registrationInfo.name] = dlpId;
 
         _createStake(registrationInfo.ownerAddress, dlpId, msg.value);
 
@@ -1015,10 +1068,10 @@ contract DLPRootImplementation is
             uint256 rewardAmount = (((epochDlp.rewardAmount * epochDlp.stakersPercentage) / 100e18) * stakeScore) /
                 epochDlp.totalStakesScore;
 
-            uint256 numberOfDays = 1 + (block.number - epoch.endBlock) / daySize;
+            uint256 numberOfBlocks = block.number - epoch.endBlock;
 
-            if (rewardClaimDelayTmp > 0 && numberOfDays < rewardClaimDelayTmp) {
-                rewardAmount = (rewardAmount * numberOfDays) / rewardClaimDelayTmp;
+            if (rewardClaimDelayTmp > 0 && numberOfBlocks < rewardClaimDelayTmp) {
+                rewardAmount = (rewardAmount * numberOfBlocks) / rewardClaimDelayTmp;
             } else if (isClaim) {
                 stake.lastClaimedIndexEpochId = epochToClaimIndex;
             }

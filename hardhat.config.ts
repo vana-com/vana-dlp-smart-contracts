@@ -7,10 +7,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.24",
-};
-
-module.exports = {
   solidity: {
     version: "0.8.24",
     settings: {
@@ -24,7 +20,7 @@ module.exports = {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
-     islander: {
+    islander: {
       url: process.env.ISLANDER_RPC_URL || "",
       accounts:
         process.env.DEPLOYER_PRIVATE_KEY !== undefined
@@ -100,7 +96,6 @@ module.exports = {
   gasReporter: {
     enabled: true,
     excludeContracts: ["mocks", "tests"],
-    include: ["../node_module/@openzeppelin/contracts-upgradeable"],
   },
 };
 export default config;
