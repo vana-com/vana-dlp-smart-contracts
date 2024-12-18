@@ -38,7 +38,7 @@ Moksha: [0x3c92fD91639b41f13338CE62f19131e7d19eaa0D](https://moksha.vanascan.io/
 
 ### [Root Network Contract](https://docs.vana.org/vana/core-concepts/key-elements/smart-contracts#root-network-contract)
 
-The DLP Root contract manages the registration and reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. It operates on an epoch-based system, where the top 16 most staked DLPs and their stakers receive rewards at the end of each epoch. The contract allows users to stake VANA tokens as guarantors for DLPs, with rewards distributed based on the staking position at the beginning of each epoch.
+The DLP Root contract manages the registration and reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. It operates on an epoch-based system, where the top 16 most staked DLPs and their stakers receive rewards at the end of each epoch. The contract allows users to stake VANA tokens as guarantors for DLPs, with rewards distributed based on the staking position at the end of each epoch.
 
 Moksha:  [0xff14346dF2B8Fd0c95BF34f1c92e49417b508AD5](https://moksha.vanascan.io/address/0xff14346dF2B8Fd0c95BF34f1c92e49417b508AD5)  
 
@@ -93,17 +93,17 @@ E.g. https://moksha.vanascan.io/tx/0x84532d83be589ec1c13d9de04e426dcc7c54652060f
 
 #### Epoch System
 
-- The RootNetwork operates on an epoch-based timeline (1 hour on moksha)
+- The RootNetwork operates on an epoch-based timeline (21 days on mainnet, 21 hours on moksha)
 
 #### DLP Selection Process
 
-1. At the beginning of each epoch, the top 16 DLPs are selected based on their total staked amount.
-2. Only these 16 DLPs participate in that epoch.
-3. Other DLPs can compete for future epochs by accumulating more stakes.
+1. At the end of each epoch, the top 16 DLPs are selected based on their total staked amount.  
+2. Only these 16 DLPs receive rewards for the epoch that just ended.  
+3. Only stakers for these 16 DLPs receive rewards for the epoch that just ended.   
 
 #### Reward Distribution
 
-1. At the end of each epoch, rewards are distributed to the 16 participating DLPs based on their performance during the epoch.
+1. At the end of each epoch, rewards are distributed to the 16 participating DLPs based on the total amount staked for each DLP.
 2. For each DLP:
     - A portion of the reward goes to the DLP owner.
     - The rest is reserved for the DLP's stakers (as per the `stakersPercentage`).
@@ -127,7 +127,7 @@ E.g. https://moksha.vanascan.io/tx/0x84532d83be589ec1c13d9de04e426dcc7c54652060f
 
 #### Important Considerations
 
-- The selection of top DLPs occurs at the start of each epoch, so staking positions at that time are crucial.
+- The selection of top DLPs occurs at the end of each epoch, so staking positions at that time are crucial.
 - Stakers should regularly check and claim their rewards to ensure they receive their share.
 - DLP owners should carefully consider their `stakersPercentage` to balance attracting stakers and maintaining profitability.
 - Data contributors should understand the specific reward mechanism of each DLP they contribute to.
@@ -233,7 +233,7 @@ After deploying your DLP, you need to register it on the RootNetwork contract. T
     - `website`: The website URL for your DLP
     - `metadata`: Additional metadata for your DLP. This can be any string data you want to associate with your DLP or a link to a JSON file with more detailed information or it can be left empty.
    
-- Send the required stake amount with the transaction. The value sent with the transaction (`msg.value`) must be at least the `minDlpStakeAmount` (100 Vana on moksha).
+- Send the required stake amount with the transaction. The value sent with the transaction (`msg.value`) must be at least the `minDlpStakeAmount` (100 Vana on moksha and mainnet).
 
 E.g.  https://moksha.vanascan.io/tx/0xd3472bfaa68990c2dd7e0c9ff125936a6edcc031be1beb589fc7cc92e683cb46
 
@@ -246,6 +246,65 @@ Upon successful registration:
 4. The DLP is added to the list of registered DLPs.
 5. Users can start staking VANA tokens to the DLP to participate in the reward distribution.
 
+#### 6. Edit your DLP details
+
+```solidity
+function updateDlp(uint256 dlpId, DlpRegistration calldata dlpUpdateInfo) external
+```
+Updates an existing DLP's information. This method allows modification of various DLP parameters while maintaining its registration status. Note that the DLP address cannot be changed after registration.
+
+**Parameters:**
+- `dlpId`: The ID of the DLP to update
+- `dlpUpdateInfo`: A struct containing the updated DLP information:
+    - `dlpAddress`: The address of the DLP cannot be changed so  it must match the existing address
+    - `ownerAddress`: The new owner address for the DLP
+    - `treasuryAddress`: The new treasury address for receiving rewards
+    - `stakersPercentage`: The new percentage of rewards to be distributed to stakers (in 18 decimal format)
+    - `name`: The updated name of the DLP
+    - `iconUrl`: The updated URL for the DLP's icon
+    - `website`: The updated website URL
+    - `metadata`: Updated metadata or additional information
+
+**Restrictions:**
+- Can only be called by the current DLP owner
+- Contract must not be paused
+- New stakersPercentage must be between minDlpStakersPercentage and maxDlpStakersPercentage
+- DLP address cannot be changed
+- Owner and treasury addresses cannot be zero addresses
+
+**Events Emitted:**
+- `DlpUpdated(uint256 indexed dlpId, address indexed dlpAddress, address ownerAddress, address treasuryAddress, uint256 stakersPercentage, string name, string iconUrl, string website, string metadata)`
+
+**Errors:**
+- `NotDlpOwner`: Thrown if called by any account other than the DLP owner
+- `InvalidAddress`: Thrown if owner or treasury address is zero
+- `InvalidStakersPercentage`: Thrown if the new stakersPercentage is outside allowed range
+- `DLpAddressCannotBeChanged`: Thrown if attempting to change the DLP address
+- `EnforcedPause`: Thrown if the contract is paused
+
+#### 7. Deregister your DLP
+
+```solidity
+function deregisterDlp(uint256 dlpId) external
+```
+Deregisters a DLP from the network, removing it from the list of eligible DLPs. Once deregistered, a DLP can no longer participate in epochs or receive rewards.
+
+**Parameters:**
+- `dlpId`: The ID of the DLP to deregister
+
+**Restrictions:**
+- Can only be called by the DLP owner
+
+**Events Emitted:**
+- `DlpDeregistered(uint256 indexed dlpId)`
+
+**Errors:**
+- `NotDlpOwner`: Thrown if called by any account other than the DLP owner
+- `InvalidDlpStatus`: Thrown if the DLP is not in a valid status for deregistration
+- `EnforcedPause`: Thrown if the contract is paused
+
+After deregistration all stakes associated to that dlp must be closed by the stakers.  
+DLP owner must also close the initial stake used to register the DLP.
 
 ## 5. Dlp Contracts
 
