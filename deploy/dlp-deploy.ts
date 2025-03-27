@@ -17,7 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     process.env.TRUSTED_FORWARDER_ADDRESS ?? ethers.ZeroAddress;
 
   const tokenContractName = "DAT";
-  const tokenNameZZZZZZ =
+  const tokenName =
     process.env.DLP_TOKEN_NAME ?? "Custom Data Autonomy Token";
   const tokenSymbol = process.env.DLP_TOKEN_SYMBOL ?? "CUSTOMDAT";
 
