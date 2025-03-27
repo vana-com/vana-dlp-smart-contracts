@@ -24,28 +24,28 @@ The data registry contract functions as a central repository for managing all da
 
 The contract manages access control for these files, enabling file owners to grant specific addresses permission to access their files. It also handles the storage of file metadata, including any offchain proofs or attestations related to file validation, which can include various metrics such as authenticity, ownership, and quality scores. Users can retrieve detailed information about any file in the registry using its unique identifier, including its permissions and associated proofs.
 
-Moksha (deprecated version): [0xEA882bb75C54DE9A08bC46b46c396727B4BFe9a5](https://moksha.vanascan.io/address/0xEA882bb75C54DE9A08bC46b46c396727B4BFe9a5)  
 Moksha: [0x8C8788f98385F6ba1adD4234e551ABba0f82Cb7C](https://moksha.vanascan.io/address/0x8C8788f98385F6ba1adD4234e551ABba0f82Cb7C)
+Vana: [0x8C8788f98385F6ba1adD4234e551ABba0f82Cb7C](https://vanascan.io/address/0x8C8788f98385F6ba1adD4234e551ABba0f82Cb7C)
 
 
 ### [TEE Pool Contract](https://docs.vana.org/vana/core-concepts/key-elements/smart-contracts#tee-pool-contract)
 
 The TEE Pool contract manages and coordinates the TEE Validators and serves as an escrow for holding fees associated with validation tasks. Users pay a fee to submit data for validation, and the contract ensures that the validators process the data and provide proof of validation.
 
-Moksha (deprecated version): [0xF084Ca24B4E29Aa843898e0B12c465fAFD089965](https://moksha.vanascan.io/address/0xF084Ca24B4E29Aa843898e0B12c465fAFD089965)  
 Moksha: [0x3c92fD91639b41f13338CE62f19131e7d19eaa0D](https://moksha.vanascan.io/address/0x3c92fD91639b41f13338CE62f19131e7d19eaa0D)
-
-
-### [Root Network Contract](https://docs.vana.org/vana/core-concepts/key-elements/smart-contracts#root-network-contract)
-
-The DLP Root contract manages the registration and reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. It operates on an epoch-based system, where the top 16 most staked DLPs and their stakers receive rewards at the end of each epoch. The contract allows users to stake VANA tokens as guarantors for DLPs, with rewards distributed based on the staking position at the end of each epoch.
-
-Moksha:  [0xff14346dF2B8Fd0c95BF34f1c92e49417b508AD5](https://moksha.vanascan.io/address/0xff14346dF2B8Fd0c95BF34f1c92e49417b508AD5)  
-
+Vana: [0x3c92fD91639b41f13338CE62f19131e7d19eaa0D](https://vanascan.io/address/0x3c92fD91639b41f13338CE62f19131e7d19eaa0D)
 
 ### [Data Liquidity Pool & DLPToken](https://docs.vana.org/vana/welcome-to-vana/what-is-data-liquidity-pool)
 
 A Data Liquidity Pool (DLP) is a core component of the Vana ecosystem, designed to transform raw data into a liquid asset. It functions as a smart contract on the Vana blockchain that allows users to monetize, control, and govern their data in a decentralized manner. Each DLP can have its own token, providing contributors with ongoing rewards and governance rights.
+
+### [Root Network Contracts](https://docs.vana.org/docs/smart-contracts#/)
+
+The DLP Root contracts manage the registration and reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. It operates on an epoch-based system, where the top 16 most staked DLPs and their stakers receive rewards at the end of each epoch. The contracts allow users to stake VANA tokens as guarantors for DLPs, with rewards distributed based on the staking position at the end of each epoch.
+
+Moksha:  [0x0aBa5e28228c323A67712101d61a54d4ff5720FD](https://moksha.vanascan.io/address/0x0aBa5e28228c323A67712101d61a54d4ff5720FD)
+Vana:  [0x0aBa5e28228c323A67712101d61a54d4ff5720FD](https://vanascan.io/address/0x0aBa5e28228c323A67712101d61a54d4ff5720FD)
+
 
 **DataRegistry**, **TEEPool**, and **RootNetwork** are part of the Vana core smart contracts and do not need to be deployed by DLP builders. For testing and integration, you should use the addresses deployed on Moksha. However, you will need to deploy your own **Data Liquidity Pool** & **DLPToken** (either the template version suggested by us or your own version). Keep in mind that to be part of the Vana ecosystem and qualify for the DLP rewards program, the DLP contract needs to be integrated with **DataRegistry** and **RootNetwork** as shown in the template in this repository.
 
@@ -203,7 +203,7 @@ npx hardhat deploy --network moksha --tags DLPDeploy
 The deployment script will also verify the contract on blockscout.
 
 #### 5. Register your DLP on the RootNetwork
-After deploying your DLP, you need to register it on the RootNetwork contract. This will allow your DLP to participate in the Vana ecosystem and receive rewards. To register your DLP, call the `registerDlp` function on the RootNetwork contract.
+After deploying your DLP, you need to register it on the DLPRootCore contract. This will allow your DLP to participate in the Vana ecosystem and receive rewards. To register your DLP, call the `registerDlp` function.
 
    ```solidity
     struct DlpRegistration {
@@ -325,7 +325,7 @@ Initializes the contract with the given parameters.
 
 **Parameters:**
 - `params`: A struct containing initialization parameters
-    - `truestedForwarder`: The address of the trusted forwarder contract. See [this section](#env-truested_forwarder_address) for more details.
+    - `trustedForwarder`: The address of the trusted forwarder contract. See [this section](#env-truested_forwarder_address) for more details.
     - `ownerAddress`: The address of the contract owner. (E.g. **0x853407D0C625Ce7E43C0a2596fBc470C3a6f8305**)
     - `tokenAddress`: The address of the ERC20 token used for rewards. (E.g. **0xF3D9A139a7ba707843dD4f1FDfE0F9E55D9D8d6b**)
     - `dataRegistryAddress`: The address of the data registry contract. (E.g. **0xEA882bb75C54DE9A08bC46b46c396727B4BFe9a5**)

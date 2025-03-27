@@ -14,10 +14,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const ownerAddress = process.env.OWNER_ADDRESS ?? deployer.address;
   const trustedForwarder =
-    process.env.TRUSTED_FORWARDER_ADDRESS ?? deployer.address;
+    process.env.TRUSTED_FORWARDER_ADDRESS ?? ethers.ZeroAddress;
 
   const tokenContractName = "DAT";
-  const tokenName = process.env.DLP_TOKEN_NAME ?? "Custom Data Autonomy Token";
+  const tokenNameZZZZZZ =
+    process.env.DLP_TOKEN_NAME ?? "Custom Data Autonomy Token";
   const tokenSymbol = process.env.DLP_TOKEN_SYMBOL ?? "CUSTOMDAT";
 
   const teePoolContractAddress = process.env.TEE_POOL_CONTRACT_ADDRESS ?? "";
