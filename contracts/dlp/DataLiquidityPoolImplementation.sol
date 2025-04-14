@@ -89,6 +89,13 @@ contract DataLiquidityPoolImplementation is
      */
     event TeePoolUpdated(address newTeePool);
 
+    /**
+     * @notice Triggered when the dataRegistry has been updated
+     *
+     * @param newDataRegistry                new data registry
+     */
+    event DataRegistryUpdated(address newDataRegistry);
+
     error FileAlreadyAdded();
     error InvalidScore();
     error InvalidAttestator();
@@ -285,6 +292,17 @@ contract DataLiquidityPoolImplementation is
         teePool = ITeePool(newTeePool);
 
         emit TeePoolUpdated(newTeePool);
+    }
+
+    /**
+     * @notice Updates the dataRegistry
+     *
+     * @param newDataRegistry                new data registry
+     */
+    function updateDataRegistry(address newDataRegistry) external override onlyOwner {
+        dataRegistry = IDataRegistry(newDataRegistry);
+
+        emit DataRegistryUpdated(newDataRegistry);
     }
 
     /**
