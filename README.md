@@ -41,13 +41,13 @@ A Data Liquidity Pool (DLP) is a core component of the Vana ecosystem, designed 
 
 ### [Root Network Contracts](https://docs.vana.org/docs/smart-contracts#/)
 
-The DLP Root contracts manage the registration and reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. It operates on an epoch-based system, where the top 16 most staked DLPs and their stakers receive rewards at the end of each epoch. The contracts allow users to stake VANA tokens as guarantors for DLPs, with rewards distributed based on the staking position at the end of each epoch.
+The DLPRegistry contract manage the registration for Data Liquidity Pools (DLPs) in the Vana ecosystem.
 
-Moksha:  [0x0aBa5e28228c323A67712101d61a54d4ff5720FD](https://moksha.vanascan.io/address/0x0aBa5e28228c323A67712101d61a54d4ff5720FD)
-Vana:  [0x0aBa5e28228c323A67712101d61a54d4ff5720FD](https://vanascan.io/address/0x0aBa5e28228c323A67712101d61a54d4ff5720FD)
+Moksha:  [0x4D59880a924526d1dD33260552Ff4328b1E18a43](https://moksha.vanascan.io/address/0x4D59880a924526d1dD33260552Ff4328b1E18a43)
+Vana:  [0x4D59880a924526d1dD33260552Ff4328b1E18a43](https://vanascan.io/address/0x4D59880a924526d1dD33260552Ff4328b1E18a43)
 
 
-**DataRegistry**, **TEEPool**, and **RootNetwork** are part of the Vana core smart contracts and do not need to be deployed by DLP builders. For testing and integration, you should use the addresses deployed on Moksha. However, you will need to deploy your own **Data Liquidity Pool** & **DLPToken** (either the template version suggested by us or your own version). Keep in mind that to be part of the Vana ecosystem and qualify for the DLP rewards program, the DLP contract needs to be integrated with **DataRegistry** and **RootNetwork** as shown in the template in this repository.
+**DataRegistry**, **TEEPool**, and **DLPRegistry** are part of the Vana core smart contracts and do not need to be deployed by DLP builders. For testing and integration, you should use the addresses deployed on Moksha. However, you will need to deploy your own **Data Liquidity Pool** & **DLPToken** (either the template version suggested by us or your own version). Keep in mind that to be part of the Vana ecosystem and qualify for the DLP rewards program, the DLP contract needs to be integrated with **DataRegistry** and **RootNetwork** as shown in the template in this repository.
 
 
 ## 3. Flow
@@ -80,34 +80,11 @@ To save Bob from paying transaction fees, the DLP can act as a proxy between Bob
 
 It's important to emphasize that this is just an example of Bob's interaction with the smart contracts. In practice, there should be a user interface (UI) that comes packaged with these contracts to assist users. This UI would simplify the process for users, making it easier for them to interact with the DLP ecosystem without needing to directly interact with the smart contracts.
 
-### Reward distribution
 
-The RootNetwork smart contract manages the reward distribution for Data Liquidity Pools (DLPs) in the Vana ecosystem. Here's a detailed explanation of how the reward system works:
+#### DLP Registration
 
-#### DLP Registration and Staking
+Each DLP must register in the DLPRegistry contract using the `registerDlp` method.
 
-1. Each DLP must register in the RootNetwork contract using the `registerDLP` method.
-2. During registration, the DLP specifies a `stakersPercentage`, which determines the proportion of rewards that will go to the DLP's stakers. The remainder goes to the DLP owner.
-  
-E.g. https://moksha.vanascan.io/tx/0x84532d83be589ec1c13d9de04e426dcc7c54652060f8f78032a416d9f5dc159b
-
-#### Epoch System
-
-- The RootNetwork operates on an epoch-based timeline (21 days on mainnet, 21 hours on moksha)
-
-#### DLP Selection Process
-
-1. At the end of each epoch, the top 16 DLPs are selected based on their total staked amount.  
-2. Only these 16 DLPs receive rewards for the epoch that just ended.  
-3. Only stakers for these 16 DLPs receive rewards for the epoch that just ended.   
-
-#### Reward Distribution
-
-1. At the end of each epoch, rewards are distributed to the 16 participating DLPs based on the total amount staked for each DLP.
-2. For each DLP:
-    - A portion of the reward goes to the DLP owner.
-    - The rest is reserved for the DLP's stakers (as per the `stakersPercentage`).
-3. Staker rewards are not distributed automatically; each staker must claim their rewards individually.
 
 #### Data Contributor Rewards
 
@@ -124,15 +101,6 @@ E.g. https://moksha.vanascan.io/tx/0x84532d83be589ec1c13d9de04e426dcc7c54652060f
 - They may choose to use VANA tokens instead of a custom currency.
 - They could distribute part or all of the rewards received from the RootNetwork to data contributors.
 - More complex reward calculation mechanisms can be implemented.
-
-#### Important Considerations
-
-- The selection of top DLPs occurs at the end of each epoch, so staking positions at that time are crucial.
-- Stakers should regularly check and claim their rewards to ensure they receive their share.
-- DLP owners should carefully consider their `stakersPercentage` to balance attracting stakers and maintaining profitability.
-- Data contributors should understand the specific reward mechanism of each DLP they contribute to.
-
-This reward system incentivizes DLPs to perform well and attract stakers, while also providing flexibility in how they reward their data contributors. It creates a competitive ecosystem where DLPs strive for top positions to participate in epochs and earn rewards.
 
 
 ## 4. Installation
@@ -203,18 +171,17 @@ npx hardhat deploy --network moksha --tags DLPDeploy
 The deployment script will also verify the contract on blockscout.
 
 #### 5. Register your DLP on the RootNetwork
-After deploying your DLP, you need to register it on the DLPRootCore contract. This will allow your DLP to participate in the Vana ecosystem and receive rewards. To register your DLP, call the `registerDlp` function.
+After deploying your DLP, you need to register it on the DLPRegistry contract. This will allow your DLP to participate in the Vana ecosystem and receive rewards. To register your DLP, call the `registerDlp` function.
 
    ```solidity
     struct DlpRegistration {
-        address dlpAddress;
-        address ownerAddress;
-        address payable treasuryAddress;
-        uint256 stakersPercentage;
-        string name;
-        string iconUrl;
-        string website;
-        string metadata;
+      address dlpAddress;
+      address ownerAddress;
+      address payable treasuryAddress;
+      string name;
+      string iconUrl;
+      string website;
+      string metadata;
     }
 
     function registerDlp(
@@ -225,26 +192,22 @@ After deploying your DLP, you need to register it on the DLPRootCore contract. T
 **Parameters:**
 - `params`: A struct containing information about the DLP
     - `dlpAddress`: The address of your DLP contract
-    - `dlpOwnerAddress`: The address that will be set as the owner of the DLP and have special privileges to update the DLP parameters. It can be any address (EOA wallet, multisig, DAO contract).
+    - `ownerAddress`: The address that will be set as the owner of the DLP and have special privileges to update the DLP parameters. It can be any address (EOA wallet, multisig, DAO contract).
     - `treasuryAddress`: The address where the rewards will be sent. It can be the same as the owner address or a different address (EOA wallet, multisig, DAO contract).
-    - `stakersPercentage`: The percentage of rewards that will be distributed to stakers (in 18 decimal format, e.g., 50% would be 50e18). It should be >= minDlpStakersPercentage (>= 50e18 on moksha).
     - `name`: The name of your DLP
     - `iconUrl`: A URL to an icon image for your DLP
     - `website`: The website URL for your DLP
     - `metadata`: Additional metadata for your DLP. This can be any string data you want to associate with your DLP or a link to a JSON file with more detailed information or it can be left empty.
    
-- Send the required stake amount with the transaction. The value sent with the transaction (`msg.value`) must be at least the `minDlpStakeAmount` (100 Vana on moksha and mainnet).
+- Send the required deposit amount with the transaction. The value sent with the transaction (`msg.value`) must be 1 Vana on moksha and 100 Vana on mainnet.
 
-E.g.  https://moksha.vanascan.io/tx/0xd3472bfaa68990c2dd7e0c9ff125936a6edcc031be1beb589fc7cc92e683cb46
 
 ### After Registration
 
 Upon successful registration:
 1. The DLP is assigned a unique ID.
 2. The DLP's details are stored in the contract.
-3. The sent stake amount is recorded for the DLP owner as a stake.
-4. The DLP is added to the list of registered DLPs.
-5. Users can start staking VANA tokens to the DLP to participate in the reward distribution.
+3. The DLP is added to the list of registered DLPs.
 
 #### 6. Edit your DLP details
 
@@ -259,7 +222,6 @@ Updates an existing DLP's information. This method allows modification of variou
     - `dlpAddress`: The address of the DLP cannot be changed so  it must match the existing address
     - `ownerAddress`: The new owner address for the DLP
     - `treasuryAddress`: The new treasury address for receiving rewards
-    - `stakersPercentage`: The new percentage of rewards to be distributed to stakers (in 18 decimal format)
     - `name`: The updated name of the DLP
     - `iconUrl`: The updated URL for the DLP's icon
     - `website`: The updated website URL
@@ -268,17 +230,15 @@ Updates an existing DLP's information. This method allows modification of variou
 **Restrictions:**
 - Can only be called by the current DLP owner
 - Contract must not be paused
-- New stakersPercentage must be between minDlpStakersPercentage and maxDlpStakersPercentage
 - DLP address cannot be changed
 - Owner and treasury addresses cannot be zero addresses
 
 **Events Emitted:**
-- `DlpUpdated(uint256 indexed dlpId, address indexed dlpAddress, address ownerAddress, address treasuryAddress, uint256 stakersPercentage, string name, string iconUrl, string website, string metadata)`
+- `DlpUpdated(uint256 indexed dlpId, address indexed dlpAddress, address ownerAddress, address treasuryAddress, string name, string iconUrl, string website, string metadata)`
 
 **Errors:**
 - `NotDlpOwner`: Thrown if called by any account other than the DLP owner
 - `InvalidAddress`: Thrown if owner or treasury address is zero
-- `InvalidStakersPercentage`: Thrown if the new stakersPercentage is outside allowed range
 - `DLpAddressCannotBeChanged`: Thrown if attempting to change the DLP address
 - `EnforcedPause`: Thrown if the contract is paused
 
@@ -302,9 +262,6 @@ Deregisters a DLP from the network, removing it from the list of eligible DLPs. 
 - `NotDlpOwner`: Thrown if called by any account other than the DLP owner
 - `InvalidDlpStatus`: Thrown if the DLP is not in a valid status for deregistration
 - `EnforcedPause`: Thrown if the contract is paused
-
-After deregistration all stakes associated to that dlp must be closed by the stakers.  
-DLP owner must also close the initial stake used to register the DLP.
 
 ## 5. Dlp Contracts
 
