@@ -1,6 +1,20 @@
-# Data Liquidity Pool (DLP)
+⚠️ DEPRECATED REPOSITORY
+This repo is deprecated. For documentation about how to deploy DLP & DAT (VRC20) contracts please read the documentation from:
 
-## Table of Contents
+https://docs.vana.org/docs/1-deploy-smart-contracts#/
+https://github.com/vana-com/vana-smart-contracts/tree/main/contracts/dlpTemplates
+
+
+
+
+
+
+# Deprecated Documentation
+
+
+## Data Liquidity Pool (DLP)
+
+### Table of Contents
 1. [Introduction](#1-introduction)
 2. [Overview](#2-overview)
 3. [Flow](#3-flow)
@@ -10,13 +24,13 @@
     - [DAT (Data Access Token)](#dat-data-access-token)
 
 
-## 1. Introduction
+### 1. Introduction
 
 Vana turns data into currency to push the frontiers of decentralized AI. It is a layer one blockchain designed for private, user-owned data. It allows users to collectively own, govern, and earn from the AI models trained on their data. For more context see this [docs](https://docs.vana.org/vana).
 
 This repository is designed for DLP (Data Liquidity Pool) creators and developers who want to deploy a DLP and its associated DLP Token on the Vana blockchain. The code provided here serves as an example implementation of a DLP smart contract. It's important to note that this is just one possible implementation – developers are encouraged to customize this contract or create their own versions to suit their specific use cases. Whether you're looking to create a standard DLP or develop a highly customized one, this repo provides a template implementation.
 
-## 2. Overview
+### 2. Overview
 
 ### [Data Registry Contract](https://docs.vana.org/vana/core-concepts/key-elements/smart-contracts#data-registry-contract)
 
